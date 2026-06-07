@@ -19,7 +19,7 @@
   :root{
     --bg1:#070a1c; --bg2:#140e36; --bg3:#28184e;
     --violet:#8b6cff; --blue:#56a0ff; --teal:#5ee0d8; --gold:#ffce6e;
-    --house:#56a0ff; --bills:#b06cff; --other:#5ee0d8;
+    --expenses:#56a0ff; --rent:#ffce6e; --other:#5ee0d8; --debt:#ff7aa2;
     --text:#eef0ff; --muted:#9ea2d6; --faint:#6e72a8;
     --card:rgba(255,255,255,.045); --card2:rgba(255,255,255,.07);
     --border:rgba(255,255,255,.10); --border2:rgba(255,255,255,.18);
@@ -113,19 +113,26 @@
   .total .big .cur{font-size:18px;color:var(--gold);font-family:var(--font-b);font-weight:700;}
   .total .sub{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap;justify-content:center;}
   .total .sub div{font-size:12.5px;color:var(--muted);text-align:center;}
-  .total .sub b{display:block;color:var(--text);font-size:16px;font-weight:700;font-family:var(--font-d);direction:ltr;}
+  .total .sub b{display:block;color:var(--text);font-size:16px;font-weight:700;font-family:var(--font-d);direction:ltr;unicode-bidi:isolate;}
   .total .sub .rem b{color:var(--gold);}
 
   /* ===== بطاقات المجموعات ===== */
-  .groups{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
-  .gcard{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);
-    padding:13px 11px;text-align:center;backdrop-filter:blur(12px);position:relative;overflow:hidden;}
-  .gcard .dot{width:34px;height:34px;border-radius:11px;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;font-size:17px;}
-  .gcard .gname{font-size:12px;color:var(--muted);}
-  .gcard .gval{font-family:var(--font-d);font-weight:700;font-size:16.5px;margin-top:2px;direction:ltr;}
-  .gcard[data-g="house"] .dot{background:rgba(86,160,255,.2);box-shadow:0 0 16px rgba(86,160,255,.35);}
-  .gcard[data-g="bills"] .dot{background:rgba(176,108,255,.2);box-shadow:0 0 16px rgba(176,108,255,.35);}
-  .gcard[data-g="other"] .dot{background:rgba(94,224,216,.2);box-shadow:0 0 16px rgba(94,224,216,.35);}
+  .groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+  .gcard{background:linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.03));border:1px solid var(--border);border-radius:18px;
+    padding:14px 12px;text-align:center;backdrop-filter:blur(14px);position:relative;overflow:hidden;box-shadow:0 14px 34px -22px rgba(0,0,0,.55);}
+  .gcard::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 45%);pointer-events:none;}
+  .gcard.wide{grid-column:1/-1;padding-block:16px 15px;}
+  .gcard .dot{width:38px;height:38px;border-radius:13px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .gcard .gname{font-size:12.5px;color:#e8e9ff;font-weight:700;}
+  .gcard .gsub{font-size:10.5px;color:var(--muted);margin-top:2px;min-height:16px;}
+  .gcard .gval{font-family:var(--font-d);font-weight:700;font-size:18px;margin-top:4px;direction:ltr;unicode-bidi:isolate;}
+  .gcard[data-g="expenses"] .dot{background:rgba(86,160,255,.2);box-shadow:0 0 16px rgba(86,160,255,.35);}
+  .gcard[data-g="rent"] .dot{background:rgba(255,206,110,.16);box-shadow:0 0 16px rgba(255,206,110,.28);}
+  .gcard[data-g="other"] .dot{background:rgba(94,224,216,.18);box-shadow:0 0 16px rgba(94,224,216,.32);}
+  .gcard[data-g="debt-paid"] .dot,.gcard[data-g="debt-rem"] .dot{background:rgba(255,122,162,.14);box-shadow:0 0 16px rgba(255,122,162,.28);}
+  .gcard[data-g="debt-paid"]{border-color:rgba(255,122,162,.18);}
+  .gcard[data-g="debt-rem"]{border-color:rgba(255,206,110,.18);}
+  @media (max-width:380px){.groups{grid-template-columns:1fr;}.gcard.wide{grid-column:auto;}}
 
   /* ===== بطاقة المدخرات ===== */
   .savings{display:flex;align-items:center;gap:14px;border-radius:var(--r);padding:16px 18px;margin-bottom:18px;
@@ -141,7 +148,7 @@
   .savings .smonth{font-family:var(--font-d);font-weight:700;font-size:22px;color:var(--teal);
     direction:ltr;margin-top:1px;display:flex;align-items:baseline;gap:6px;justify-content:flex-end;}
   .savings .stotal{font-size:11.5px;color:var(--faint);margin-top:2px;}
-  .savings .stotal b{color:var(--gold);font-family:var(--font-d);}
+  .savings .stotal b{color:var(--gold);font-family:var(--font-d);direction:ltr;unicode-bidi:isolate;}
   .savings .sadd{width:42px;height:42px;border-radius:13px;border:1px solid rgba(94,224,216,.4);flex-shrink:0;
     background:rgba(94,224,216,.14);color:var(--teal);font-size:22px;cursor:pointer;transition:transform .12s, background .2s;}
   .savings .sadd:active{transform:scale(.9);background:rgba(94,224,216,.28);}
@@ -177,7 +184,7 @@
   .item .meta{font-size:12px;color:var(--muted);margin-top:1px;}
   .item .pill{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:20px;margin-inline-start:6px;
     background:rgba(255,206,110,.16);color:var(--gold);border:1px solid rgba(255,206,110,.3);}
-  .item .amt{text-align:left;flex-shrink:0;direction:ltr;}
+  .item .amt{text-align:left;flex-shrink:0;direction:ltr;unicode-bidi:isolate;}
   .item .amt .p{font-family:var(--font-d);font-weight:700;font-size:16px;}
   .item .amt .r{font-size:11px;color:var(--gold);margin-top:1px;}
   .item .edit{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;flex-shrink:0;}
@@ -322,34 +329,36 @@
     <div class="lbl">إجمالي منصرفات الشهر</div>
     <div class="big"><span id="totPaid">0</span><span class="cur">ر.س</span></div>
     <div class="sub">
-      <div>المدفوع هذا الشهر<b id="totDue">0</b></div>
+      <div>إجمالي المطلوب لهذا الشهر<b id="totDue">0</b></div>
       <div class="rem">المتبقي للأشهر القادمة<b id="totRem">0</b></div>
     </div>
   </div>
 
   <div class="groups">
-    <div class="gcard" data-g="house"><div class="dot">🏠</div><div class="gname">منصرفات البيت</div><div class="gval" id="gHouse">0</div></div>
-    <div class="gcard" data-g="bills"><div class="dot">🧾</div><div class="gname">الفواتير</div><div class="gval" id="gBills">0</div></div>
-    <div class="gcard" data-g="other"><div class="dot">✨</div><div class="gname">أخرى</div><div class="gval" id="gOther">0</div></div>
+    <div class="gcard wide" data-g="expenses"><div class="dot">🧳</div><div class="gname">مصاريف</div><div class="gsub">البيت + المسافرين</div><div class="gval" id="gExpenses">0</div></div>
+    <div class="gcard" data-g="rent"><div class="dot">🏘️</div><div class="gname">الإيجار</div><div class="gsub">بند مستقل</div><div class="gval" id="gRent">0</div></div>
+    <div class="gcard" data-g="other"><div class="dot">✨</div><div class="gname">أخرى / سلف</div><div class="gsub">متفرقات شهرية</div><div class="gval" id="gOther">0</div></div>
+    <div class="gcard" data-g="debt-paid"><div class="dot">💳</div><div class="gname">الديون المدفوعة</div><div class="gsub">المسدّد هذا الشهر</div><div class="gval" id="gDebtPaid">0</div></div>
+    <div class="gcard" data-g="debt-rem"><div class="dot">⏳</div><div class="gname">الديون المتبقية</div><div class="gsub">للشهور القادمة</div><div class="gval" id="gDebtRem">0</div></div>
   </div>
 
   <div class="savings">
     <div class="pig"><span class="dollar">$</span></div>
     <div class="sinfo">
       <div class="stitle">مدخرات هذا الشهر</div>
-      <div class="smonth" id="savMonth">0 ر.س</div>
-      <div class="stotal">المجموع المُدّخر خلال السنة: <b id="savTotal">0 ر.س</b></div>
+      <div class="smonth" id="savMonth">0 ⁦ر.س⁩</div>
+      <div class="stotal">المجموع المُدّخر خلال السنة: <b id="savTotal">0 ⁦ر.س⁩</b></div>
     </div>
     <button class="sadd" id="savAdd" aria-label="إضافة مدخرات">＋</button>
   </div>
 
   <div class="actions">
-    <button class="btn btn-primary" id="addBtn">＋ إضافة مصروف</button>
+    <button class="btn btn-primary" id="addBtn">＋ إضافة بند</button>
     <button class="btn btn-ghost" id="catBtn">⚙︎ الفئات</button>
     <button class="btn btn-ghost" id="repBtn">📄 التقارير</button>
   </div>
 
-  <div class="section-title">مصاريف الشهر</div>
+  <div class="section-title">سجل الشهر</div>
   <div id="list"></div>
 
   <div class="copyright">جميع الحقوق محفوظة <span class="sp">✦</span> سُهيل <span id="copyYear"></span></div>
@@ -358,7 +367,7 @@
 <!-- مودال إضافة/تعديل مصروف -->
 <div class="overlay" id="itemModal">
   <div class="sheet">
-    <h3 id="itemTitle">إضافة مصروف</h3>
+    <h3 id="itemTitle">إضافة بند</h3>
     <div class="field">
       <label>الفئة</label>
       <select id="f_cat"></select>
@@ -368,7 +377,7 @@
       <input type="text" id="f_desc" placeholder="مثال: تموينات نهاية الشهر" />
     </div>
     <div class="switch" id="f_carry_sw">
-      <div><div class="lab">فاتورة بترحيل المتبقي</div><div class="desc">المتبقي ينتقل للشهر القادم تلقائياً</div></div>
+      <div><div class="lab">بند بترحيل المتبقي</div><div class="desc">المتبقي ينتقل للشهر القادم تلقائياً</div></div>
       <div class="tg"></div>
     </div>
     <div class="row2" id="dueWrap">
@@ -423,9 +432,10 @@
       </div>
       <div class="field"><label>تُحسب ضمن</label>
         <select id="c_group">
-          <option value="house">منصرفات البيت</option>
-          <option value="bills">الفواتير</option>
-          <option value="other">منصرفات أخرى</option>
+          <option value="expenses">مصاريف</option>
+          <option value="rent">الإيجار</option>
+          <option value="debts">الديون</option>
+          <option value="other">أخرى / سلف</option>
         </select>
       </div>
       <div class="sheet-actions">
@@ -462,27 +472,79 @@
 <script>
 "use strict";
 /* ============ التخزين ============ */
-const KEY = "suhayl_state_v1";
+const KEY = "suhayl_state_v2";
+const LEGACY_KEYS = ["suhayl_state_v1"];
 const CUR = "ر.س";
-const GROUPS = {house:"منصرفات البيت", bills:"الفواتير", other:"منصرفات أخرى"};
-const EMOJIS = ["🛒","🏠","⛽","💡","🌐","💳","🧾","🍔","🚗","💊","📱","👕","🎁","✨","☕","🏥","✈️","📚","🐾","💧","🔥","💵"];
+const GROUPS = {expenses:"مصاريف", rent:"الإيجار", other:"أخرى / سلف", debts:"الديون"};
+const EMOJIS = ["🛒","🏠","🧳","✈️","⛽","🏘️","💡","🌐","💳","🤝","🧾","🍔","🚗","💊","📱","👕","🎁","✨","☕","🏥","📚","🐾","💧","🔥","💵"];
+const REQUIRED_CATEGORIES = [
+  {name:"غذائية", emoji:"🛒", group:"expenses"},
+  {name:"منزلية", emoji:"🏠", group:"expenses"},
+  {name:"بنزين", emoji:"⛽", group:"expenses"},
+  {name:"إيجار", emoji:"🏘️", group:"rent"},
+  {name:"كهرباء", emoji:"💡", group:"other"},
+  {name:"نت", emoji:"🌐", group:"other"},
+  {name:"سلفة", emoji:"🤝", group:"other"},
+  {name:"ديون", emoji:"💳", group:"debts"},
+  {name:"تمارا", emoji:"💳", group:"debts"},
+  {name:"تابي", emoji:"💳", group:"debts"},
+  {name:"مصاريف ناس قبرص", emoji:"🧳", group:"expenses"},
+  {name:"مصاريف ناس الصين", emoji:"🧳", group:"expenses"}
+];
 
 const defaultState = () => ({
-  categories:[
-    {id:"c1", name:"غذائية",  emoji:"🛒", group:"house"},
-    {id:"c2", name:"منزلية",  emoji:"🏠", group:"house"},
-    {id:"c3", name:"بنزين",   emoji:"⛽", group:"other"},
-    {id:"c4", name:"كهرباء",  emoji:"💡", group:"bills"},
-    {id:"c5", name:"نت",      emoji:"🌐", group:"bills"},
-    {id:"c6", name:"تمارا",   emoji:"💳", group:"bills"},
-    {id:"c7", name:"تابي",    emoji:"💳", group:"bills"},
-  ],
+  categories: REQUIRED_CATEGORIES.map((c,i)=>({id:`c${i+1}`, ...c})),
   months:{},  // "YYYY-MM": { seeded:bool, items:[...] }
   savings:{}  // "YYYY-MM": {amount, note}
 });
 
 let state = load();
-function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.categories){ if(!s.savings) s.savings={}; return s; } }catch(e){} return defaultState(); }
+function normalizeGroup(name, group){
+  const label = String(name||"");
+  if(["expenses","rent","other","debts"].includes(group)) return group;
+  if(/إيجار|ايجار/.test(label)) return "rent";
+  if(/ديون|دين|تمارا|تابي/.test(label)) return "debts";
+  if(/سلفة/.test(label)) return "other";
+  if(/غذائي|منزل|بنزين|قبرص|الصين|مسافر/.test(label)) return "expenses";
+  if(group==="house") return "expenses";
+  if(group==="bills") return "other";
+  if(group==="other") return "other";
+  return "expenses";
+}
+function ensureCategories(list){
+  const out = (Array.isArray(list)?list:[]).map((c,idx)=>({
+    id:c.id || `cat_${idx+1}`,
+    name:c.name || `فئة ${idx+1}`,
+    emoji:c.emoji || "✨",
+    group:normalizeGroup(c.name, c.group)
+  }));
+  const names = new Set(out.map(c=>c.name));
+  REQUIRED_CATEGORIES.forEach((c,idx)=>{
+    if(!names.has(c.name)) out.push({id:`req_${idx+1}`, ...c});
+  });
+  return out;
+}
+function load(){
+  for(const storageKey of [KEY, ...LEGACY_KEYS]){
+    try{
+      const raw = localStorage.getItem(storageKey);
+      if(!raw) continue;
+      const s = JSON.parse(raw);
+      if(s && s.categories){
+        const normalized = {
+          categories: ensureCategories(s.categories),
+          months: s.months && typeof s.months === "object" ? s.months : {},
+          savings: s.savings && typeof s.savings === "object" ? s.savings : {}
+        };
+        if(storageKey !== KEY){
+          try{ localStorage.setItem(KEY, JSON.stringify(normalized)); }catch(e){}
+        }
+        return normalized;
+      }
+    }catch(e){}
+  }
+  return defaultState();
+}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 
 /* ============ أدوات ============ */
@@ -491,7 +553,7 @@ const uid = () => Math.random().toString(36).slice(2,9);
 const num = v => { const n=parseFloat(v); return isNaN(n)?0:n; };
 function money(n, withCur=true){
   const f = new Intl.NumberFormat("en-US",{minimumFractionDigits:0, maximumFractionDigits:2}).format(Math.round((n+Number.EPSILON)*100)/100);
-  return withCur ? `${f} ${CUR}` : f;
+  return withCur ? `⁦${f} ${CUR}⁩` : f;
 }
 function pad(n){ return String(n).padStart(2,"0"); }
 const AR_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
@@ -576,20 +638,28 @@ function shiftMonth(d){
 function render(){
   seedMonth(selKey);
   const M=getMonth(selKey);
-  let paid=0,due=0,rem=0, g={house:0,bills:0,other:0};
+  let paid=0,due=0,rem=0, g={expenses:0,rent:0,other:0,debtPaid:0,debtRem:0};
   M.items.forEach(it=>{
     const p=num(it.paid), dd=num(it.due);
-    paid+=p; due+=dd;
-    if(it.carry) rem+=Math.max(dd-p,0);
+    const remaining = it.carry ? Math.max(dd-p,0) : 0;
+    paid+=p; due+=dd; rem+=remaining;
     const c=catById(it.catId);
-    if(c) g[c.group]=(g[c.group]||0)+p;
+    const group=(c&&c.group) || "other";
+    if(group === "debts"){
+      g.debtPaid += p;
+      g.debtRem += remaining;
+    }else{
+      g[group] = (g[group]||0) + p;
+    }
   });
   $("#totPaid").textContent = money(paid, false);
-  $("#totDue").textContent = money(paid);
+  $("#totDue").textContent = money(due);
   $("#totRem").textContent = money(rem);
-  $("#gHouse").textContent = money(g.house);
-  $("#gBills").textContent = money(g.bills);
+  $("#gExpenses").textContent = money(g.expenses);
+  $("#gRent").textContent = money(g.rent);
   $("#gOther").textContent = money(g.other);
+  $("#gDebtPaid").textContent = money(g.debtPaid);
+  $("#gDebtRem").textContent = money(g.debtRem);
 
   // المدخرات
   const sv = state.savings[selKey];
@@ -615,7 +685,7 @@ function render(){
       <div class="ic">${c.emoji}</div>
       <div class="info">
         <div class="nm">${c.name}${it.desc?` — ${escapeHtml(it.desc)}`:""}${it.carried?'<span class="pill">مُرحّل</span>':""}</div>
-        <div class="meta">${it.carry?"فاتورة":"مصروف"} · ${it.date||""}</div>
+        <div class="meta">${itemKind(it,c)} · ${it.date||""}</div>
       </div>
       <div class="amt">
         <div class="p">${money(num(it.paid))}</div>
@@ -629,6 +699,14 @@ function render(){
   });
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function itemKind(it,c){
+  const group=(c&&c.group)||"other";
+  if(group==="debts") return "دين";
+  if(c && /سلفة/.test(c.name||"")) return "سلفة";
+  if(group==="rent") return "إيجار";
+  if(it.carry) return "بند مُرحّل";
+  return "مصروف";
+}
 
 /* ============ مودال المصروف ============ */
 let editingId=null;
@@ -641,10 +719,10 @@ function fillCatSelect(){
 function setCarry(on){
   const sw=$("#f_carry_sw");
   sw.classList.toggle("on",on);
-  $("#dueLabel").textContent = on ? "المبلغ المطلوب" : "المبلغ";
-  $("#paidLabel").textContent = on ? "المدفوع هذا الشهر" : "المبلغ";
+  $("#dueLabel").textContent = on ? "إجمالي المبلغ" : "المبلغ المدفوع";
+  $("#paidLabel").textContent = on ? "المدفوع هذا الشهر" : "المبلغ المدفوع";
   $("#incWrap").classList.toggle("hide", !on);
-  // إذا مصروف عادي: نخفي حقل "المطلوب" ونستخدم المدفوع فقط
+  // إذا كان البند بدون ترحيل نخفي إجمالي المبلغ ونستخدم المدفوع فقط
   $("#dueWrap").querySelector(".field").classList.toggle("hide", !on);
 }
 $("#f_carry_sw").addEventListener("click", ()=> setCarry(!$("#f_carry_sw").classList.contains("on")));
@@ -654,14 +732,14 @@ function openItem(id){
   fillCatSelect();
   if(id){
     const it=getMonth(selKey).items.find(x=>x.id===id);
-    $("#itemTitle").textContent="تعديل مصروف";
+    $("#itemTitle").textContent="تعديل بند";
     $("#f_cat").value=it.catId; $("#f_desc").value=it.desc||"";
     setCarry(!!it.carry);
     $("#f_due").value=it.due||""; $("#f_paid").value=it.paid||"";
     $("#f_inc").value=it.inc||""; $("#f_date").value=it.date||todayISO();
     $("#delItem").classList.remove("hide");
   }else{
-    $("#itemTitle").textContent="إضافة مصروف";
+    $("#itemTitle").textContent="إضافة بند";
     $("#f_desc").value=""; setCarry(false);
     $("#f_due").value=""; $("#f_paid").value=""; $("#f_inc").value="";
     $("#f_date").value=todayISO();
@@ -692,7 +770,7 @@ $("#saveItem").addEventListener("click", ()=>{
 });
 $("#delItem").addEventListener("click", ()=>{
   if(!editingId) return;
-  if(!confirm("حذف هذا المصروف؟")) return;
+  if(!confirm("حذف هذا البند؟")) return;
   const M=getMonth(selKey); M.items=M.items.filter(x=>x.id!==editingId);
   save(); hide("#itemModal"); render();
 });
@@ -717,7 +795,7 @@ $("#saveSav").addEventListener("click", ()=>{
 });
 
 /* ============ مودال الفئات ============ */
-let editingCat=null, pickedEmoji="✨";
+let editingCat=null, pickedEmoji="🧳";
 function renderCats(){
   $("#catList").innerHTML = state.categories.map(c=>`
     <div class="cat-row" data-id="${c.id}">
@@ -753,7 +831,7 @@ function openCatForm(id){
     const c=catById(id);
     $("#c_name").value=c.name; $("#c_group").value=c.group; selEmoji(c.emoji);
   }else{
-    $("#c_name").value=""; $("#c_group").value="house"; selEmoji("✨");
+    $("#c_name").value=""; $("#c_group").value="expenses"; selEmoji("🧳");
   }
 }
 $("#newCat").addEventListener("click", ()=>openCatForm(null));
@@ -820,18 +898,21 @@ function buildReport(){
     title="التقرير الشهري";
     periodLabel=mLabel(selKey);
   }
-  let paid=0,due=0,rem=0;
-  const byGroup={house:[],bills:[],other:[]};
+  let paid=0,due=0,rem=0,debtPaid=0,debtRem=0;
+  const byGroup={expenses:[],rent:[],other:[],debts:[]};
   items.forEach(it=>{
-    paid+=num(it.paid); due+=num(it.due);
-    if(it.carry) rem+=Math.max(num(it.due)-num(it.paid),0);
-    const c=catById(it.catId); (byGroup[c?c.group:"other"]||byGroup.other).push(it);
+    const p=num(it.paid), d=num(it.due), remaining=it.carry?Math.max(d-p,0):0;
+    paid+=p; due+=d; rem+=remaining;
+    const c=catById(it.catId);
+    const group=(c&&c.group)||"other";
+    if(group==="debts"){ debtPaid+=p; debtRem+=remaining; }
+    (byGroup[group]||byGroup.other).push(it);
   });
   // مدخرات (الشهرية فقط — في التقرير الأسبوعي لا تظهر لأنها شهرية)
   const svObj = state.savings[selKey];
   const svAmt = (repType==="month" && svObj) ? num(svObj.amount) : 0;
   let rows="";
-  ["house","bills","other"].forEach(gk=>{
+  ["expenses","rent","other","debts"].forEach(gk=>{
     const arr=byGroup[gk]; if(!arr.length) return;
     let gp=0; arr.forEach(it=>gp+=num(it.paid));
     rows+=`<tr class="grp"><td colspan="3">${GROUPS[gk]}</td><td>${money(gp)}</td></tr>`;
@@ -852,7 +933,7 @@ function buildReport(){
   $("#report-paper").innerHTML=`
     <div class="rp-head">
       <img src="${logo}" alt="سهيل"/>
-      <div><div class="t">سُهيل</div><div class="s">تقرير المصاريف</div></div>
+      <div><div class="t">سُهيل</div><div class="s">تقرير المصاريف والديون</div></div>
     </div>
     <div class="rp-title">${title}</div>
     <div class="rp-period">${periodLabel}</div>
@@ -860,6 +941,8 @@ function buildReport(){
       <div class="rc tot"><div class="l">إجمالي المدفوع</div><div class="v">${money(paid)}</div></div>
       <div class="rc"><div class="l">إجمالي المطلوب</div><div class="v">${money(due)}</div></div>
       <div class="rc rem"><div class="l">المتبقي للأشهر القادمة</div><div class="v">${money(rem)}</div></div>
+      <div class="rc"><div class="l">الديون المدفوعة</div><div class="v">${money(debtPaid)}</div></div>
+      <div class="rc rem"><div class="l">الديون المتبقية</div><div class="v">${money(debtRem)}</div></div>
     </div>
     ${repType==="month" ? `<div class="rp-cards" style="grid-template-columns:1fr;margin-top:-8px">
       <div class="rc" style="background:rgba(200,240,210,.55);border-color:rgba(80,170,110,.5)"><div class="l">💰 مدخرات هذا الشهر</div><div class="v" style="color:#2e8a52">${money(svAmt)}</div></div>
