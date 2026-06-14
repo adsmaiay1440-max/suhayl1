@@ -19,7 +19,7 @@
   :root{
     --bg1:#070a1c; --bg2:#140e36; --bg3:#28184e;
     --violet:#8b6cff; --blue:#56a0ff; --teal:#5ee0d8; --gold:#ffce6e;
-    --expenses:#56a0ff; --rent:#ffce6e; --other:#5ee0d8; --debt:#ff7aa2;
+    --expenses:#56a0ff; --rent:#ffce6e; --fuel:#ff9f43; --other:#5ee0d8; --debt:#ff7aa2;
     --text:#eef0ff; --muted:#9ea2d6; --faint:#6e72a8;
     --card:rgba(255,255,255,.045); --card2:rgba(255,255,255,.07);
     --border:rgba(255,255,255,.10); --border2:rgba(255,255,255,.18);
@@ -126,10 +126,18 @@
   .gcard .gname{font-size:12.5px;color:#e8e9ff;font-weight:700;}
   .gcard .gsub{font-size:10.5px;color:var(--muted);margin-top:2px;min-height:16px;}
   .gcard .gval{font-family:var(--font-d);font-weight:700;font-size:18px;margin-top:4px;direction:ltr;unicode-bidi:isolate;}
+  .gcard .gsplit{display:flex;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);}
+  .gcard .mini{flex:1;display:flex;flex-direction:column;gap:4px;align-items:center;}
+  .gcard .mini .k{font-size:11px;color:var(--muted);}
+  .gcard .mini .v{font-family:var(--font-d);font-weight:700;font-size:14px;direction:ltr;unicode-bidi:isolate;color:#fff;}
   .gcard[data-g="expenses"] .dot{background:rgba(86,160,255,.2);box-shadow:0 0 16px rgba(86,160,255,.35);}
   .gcard[data-g="rent"] .dot{background:rgba(255,206,110,.16);box-shadow:0 0 16px rgba(255,206,110,.28);}
+  .gcard[data-g="fuel"] .dot{background:rgba(255,159,67,.18);box-shadow:0 0 16px rgba(255,159,67,.34);}
   .gcard[data-g="other"] .dot{background:rgba(94,224,216,.18);box-shadow:0 0 16px rgba(94,224,216,.32);}
+  .gcard[data-g="delegations"] .dot{background:rgba(126,177,255,.18);box-shadow:0 0 16px rgba(126,177,255,.32);}
   .gcard[data-g="debt-paid"] .dot,.gcard[data-g="debt-rem"] .dot{background:rgba(255,122,162,.14);box-shadow:0 0 16px rgba(255,122,162,.28);}
+  .gcard[data-g="fuel"]{border-color:rgba(255,159,67,.24);}
+  .gcard[data-g="delegations"]{border-color:rgba(126,177,255,.26);}
   .gcard[data-g="debt-paid"]{border-color:rgba(255,122,162,.18);}
   .gcard[data-g="debt-rem"]{border-color:rgba(255,206,110,.18);}
   @media (max-width:380px){.groups{grid-template-columns:1fr;}.gcard.wide{grid-column:auto;}}
@@ -173,6 +181,8 @@
   .btn-primary:active{box-shadow:0 6px 16px -8px rgba(110,90,255,.9);}
   .btn-ghost{color:var(--text);background:var(--card2);border:1px solid var(--border);}
   .btn-ghost:active{background:rgba(255,255,255,.14);}
+  .btn-primary .btn-label{order:1;}
+  .btn-primary .btn-plus{order:2;font-size:18px;line-height:1;}
 
   /* ===== قائمة المصاريف ===== */
   .section-title{font-family:var(--font-d);font-size:18px;font-weight:600;margin:6px 4px 12px;color:#dfe1ff;}
@@ -242,44 +252,53 @@
   .seg button{flex:1;border:none;background:transparent;color:var(--muted);padding:9px;border-radius:9px;font-family:var(--font-b);font-weight:700;font-size:13.5px;cursor:pointer;}
   .seg button.on{background:linear-gradient(100deg,var(--violet),var(--blue));color:#fff;}
 
-  /* ===== ورقة التقرير (PDF) — خلفية صفراء بنقش دفتر ===== */
-  #report-paper{position:relative;color:#3a2e10;border-radius:16px;padding:28px 26px;font-family:var(--font-b);
-    max-width:560px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;
-    background-color:#fdf3cf;
+  /* ===== ورقة التقرير (PDF) — نسخة ألطف للمعاينة والطباعة ===== */
+  #report-modal{position:relative;}
+  .report-hint{margin:0 0 12px;text-align:center;font-size:12.5px;color:#d8c998;background:rgba(255,206,110,.08);
+    border:1px solid rgba(255,206,110,.18);border-radius:12px;padding:9px 12px;}
+  #report-paper{position:relative;color:#4a3608;border-radius:24px;padding:30px 26px;font-family:var(--font-b);
+    max-width:560px;width:100%;box-shadow:0 26px 72px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.55);overflow:hidden;
+    background-color:#fdf4c9;
     background-image:
-      /* خطوط دفتر أفقية */
-      repeating-linear-gradient(180deg, transparent 0 31px, rgba(193,150,40,.16) 31px 32px),
-      /* هامش جانبي أحمر باهت */
-      linear-gradient(90deg, transparent 0 calc(100% - 42px), rgba(214,120,90,.28) calc(100% - 42px) calc(100% - 40px), transparent calc(100% - 40px)),
-      radial-gradient(circle at 12% 88%, rgba(255,210,120,.5), transparent 35%),
-      linear-gradient(135deg,#fdf6d8,#f8e9b0);
+      radial-gradient(circle at 12% 16%, rgba(255,255,255,.6), transparent 18%),
+      radial-gradient(circle at 88% 0%, rgba(255,221,129,.72), transparent 24%),
+      repeating-linear-gradient(180deg, transparent 0 33px, rgba(193,150,40,.14) 33px 34px),
+      linear-gradient(135deg,#fff5d7 0%, #f9ebaf 46%, #f3de8c 100%);
+    border:1px solid rgba(183,138,35,.34);
   }
-  /* نقش أيقونات دفاتر وأقلام خفيف */
-  #report-paper::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;z-index:0;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%237a5a10' stroke-width='2'%3E%3Crect x='14' y='16' width='26' height='32' rx='2'/%3E%3Cline x1='19' y1='24' x2='35' y2='24'/%3E%3Cline x1='19' y1='30' x2='35' y2='30'/%3E%3Cline x1='19' y1='36' x2='30' y2='36'/%3E%3Cpath d='M78 78 l22 -22 6 6 -22 22 -8 2 z'/%3E%3Cline x1='84' y1='84' x2='98' y2='70'/%3E%3Ccircle cx='90' cy='28' r='10'/%3E%3Cline x1='30' y1='90' x2='52' y2='90'/%3E%3Cline x1='30' y1='98' x2='48' y2='98'/%3E%3C/g%3E%3C/svg%3E");
-    background-size:120px 120px;}
+  #report-paper::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.09;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%238b6516' stroke-width='1.5' opacity='0.75'%3E%3Cpath d='M18 34c16-16 42-16 58 0M104 34c16-16 42-16 58 0M18 146c16 16 42 16 58 0M104 146c16 16 42 16 58 0'/%3E%3Cpath d='M36 20h28M116 20h28M36 160h28M116 160h28'/%3E%3Ccircle cx='90' cy='90' r='18'/%3E%3Cpath d='M90 62v56M62 90h56'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:180px 180px;mix-blend-mode:multiply;}
+  #report-paper::after{content:"";position:absolute;inset:12px;border-radius:18px;border:1px solid rgba(176,132,34,.28);pointer-events:none;z-index:0;}
   #report-paper>*{position:relative;z-index:1;}
-  #report-paper .rp-head{display:flex;align-items:center;gap:13px;border-bottom:2px dashed rgba(160,120,30,.5);padding-bottom:15px;margin-bottom:18px;}
-  #report-paper .rp-head img{width:50px;height:50px;filter:drop-shadow(0 4px 8px rgba(120,90,20,.3));}
-  #report-paper .rp-head .t{font-family:var(--font-d);font-weight:700;font-size:26px;color:#6b4e0e;letter-spacing:.5px;}
+  #report-paper.month-mode{box-shadow:0 30px 80px rgba(138,104,14,.22), 0 18px 46px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.62);}
+  #report-paper .rp-head{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:2px dashed rgba(160,120,30,.42);padding-bottom:16px;margin-bottom:18px;}
+  #report-paper .rp-brand{display:flex;align-items:center;gap:13px;}
+  #report-paper .rp-head img{width:52px;height:52px;filter:drop-shadow(0 6px 10px rgba(120,90,20,.28));}
+  #report-paper .rp-head .t{font-family:var(--font-d);font-weight:700;font-size:27px;color:#6b4e0e;letter-spacing:.5px;}
   #report-paper .rp-head .s{font-size:13px;color:#9a7a2a;}
-  #report-paper .rp-title{font-family:var(--font-d);font-size:22px;font-weight:700;color:#4a3508;margin-bottom:3px;}
-  #report-paper .rp-period{font-size:13.5px;color:#8a6a20;margin-bottom:18px;font-weight:500;}
-  .rp-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
-  .rp-cards .rc{border:1.5px solid rgba(170,130,40,.35);border-radius:13px;padding:12px 8px;text-align:center;
-    background:rgba(255,255,255,.55);box-shadow:0 3px 8px rgba(140,100,20,.12);}
+  #report-paper .rp-badge{padding:7px 12px;border-radius:999px;background:rgba(255,248,220,.72);border:1px solid rgba(186,145,46,.32);font-size:11.5px;color:#8c6816;font-weight:700;white-space:nowrap;}
+  #report-paper .rp-title{font-family:var(--font-d);font-size:24px;font-weight:700;color:#4a3508;margin-bottom:4px;}
+  #report-paper .rp-period{font-size:13.5px;color:#8a6a20;margin-bottom:18px;font-weight:600;}
+  .rp-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+  .rp-cards .rc{border:1.5px solid rgba(170,130,40,.28);border-radius:16px;padding:13px 10px;text-align:center;
+    background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,248,225,.52));box-shadow:0 7px 16px rgba(140,100,20,.08);}
   .rp-cards .rc .l{font-size:11.5px;color:#8a6a20;}
   .rp-cards .rc .v{font-family:var(--font-d);font-weight:700;font-size:18px;color:#6b4e0e;margin-top:4px;direction:ltr;}
-  .rp-cards .rc.tot{background:rgba(255,236,170,.85);border-color:rgba(200,150,40,.6);}
+  .rp-cards .rc.tot{background:linear-gradient(180deg, rgba(255,242,196,.95), rgba(255,229,141,.82));border-color:rgba(200,150,40,.56);}
   .rp-cards .rc.rem .v{color:#bb7a10;}
-  table.rp{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px;background:rgba(255,255,255,.4);border-radius:10px;overflow:hidden;}
-  table.rp th{background:rgba(230,190,90,.55);color:#5a4208;text-align:right;padding:9px 11px;font-weight:700;font-family:var(--font-d);}
+  .rp-cards .rc.fuel{background:linear-gradient(180deg, rgba(255,235,210,.92), rgba(255,214,160,.72));border-color:rgba(217,126,41,.45);}
+  .rp-cards .rc.fuel .v{color:#b76010;}
+  .rp-divider{height:1px;background:linear-gradient(90deg, transparent, rgba(184,140,45,.55), transparent);margin:16px 0 14px;}
+  table.rp{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;margin-bottom:14px;background:rgba(255,252,241,.62);border-radius:16px;overflow:hidden;border:1px solid rgba(178,135,38,.22);}
+  table.rp th{background:linear-gradient(180deg, rgba(240,201,102,.78), rgba(231,183,74,.68));color:#5a4208;text-align:right;padding:10px 11px;font-weight:700;font-family:var(--font-d);}
   table.rp th:last-child,table.rp td:last-child{text-align:left;direction:ltr;}
-  table.rp td{padding:9px 11px;border-bottom:1px dashed rgba(180,140,50,.3);color:#3a2e10;}
+  table.rp td{padding:10px 11px;border-bottom:1px dashed rgba(180,140,50,.22);color:#3a2e10;}
+  table.rp tbody tr:nth-child(even):not(.grp){background:rgba(255,255,255,.24);}
   table.rp tr:last-child td{border-bottom:none;}
-  table.rp .grp td{background:rgba(255,236,170,.6);font-weight:700;color:#6b4e0e;font-family:var(--font-d);}
-  table.rp tfoot td{font-weight:700;border-top:2px solid rgba(170,130,40,.5);color:#4a3508;font-size:15px;background:rgba(255,236,170,.7);}
-  .rp-foot{text-align:center;font-size:11.5px;color:#a08440;margin-top:16px;border-top:1px dashed rgba(170,130,40,.4);padding-top:11px;font-style:italic;}
+  table.rp .grp td{background:rgba(255,236,170,.72);font-weight:700;color:#6b4e0e;font-family:var(--font-d);}
+  table.rp tfoot td{font-weight:700;border-top:2px solid rgba(170,130,40,.42);color:#4a3508;font-size:15px;background:rgba(255,236,170,.74);}
+  .rp-foot{text-align:center;font-size:11.5px;color:#9c7b25;margin-top:16px;border-top:1px dashed rgba(170,130,40,.34);padding-top:11px;font-style:italic;}
 
   @page{size:A4;margin:12mm;}
   @media print{
@@ -329,31 +348,33 @@
     <div class="lbl">إجمالي منصرفات الشهر</div>
     <div class="big"><span id="totPaid">0</span><span class="cur">ر.س</span></div>
     <div class="sub">
-      <div>إجمالي المطلوب لهذا الشهر<b id="totDue">0</b></div>
-      <div class="rem">المتبقي للأشهر القادمة<b id="totRem">0</b></div>
+      <div>إجمالي المطلوب لهذا الشهر<b id="totDue">0 ر.س</b></div>
+      <div class="rem">المتبقي للأشهر القادمة<b id="totRem">0 ر.س</b></div>
     </div>
   </div>
 
   <div class="groups">
-    <div class="gcard wide" data-g="expenses"><div class="dot">🧳</div><div class="gname">مصاريف</div><div class="gsub">البيت + المسافرين</div><div class="gval" id="gExpenses">0</div></div>
-    <div class="gcard" data-g="rent"><div class="dot">🏘️</div><div class="gname">الإيجار</div><div class="gsub">بند مستقل</div><div class="gval" id="gRent">0</div></div>
-    <div class="gcard" data-g="other"><div class="dot">✨</div><div class="gname">أخرى / سلف</div><div class="gsub">متفرقات شهرية</div><div class="gval" id="gOther">0</div></div>
-    <div class="gcard" data-g="debt-paid"><div class="dot">💳</div><div class="gname">الديون المدفوعة</div><div class="gsub">المسدّد هذا الشهر</div><div class="gval" id="gDebtPaid">0</div></div>
-    <div class="gcard" data-g="debt-rem"><div class="dot">⏳</div><div class="gname">الديون المتبقية</div><div class="gsub">للشهور القادمة</div><div class="gval" id="gDebtRem">0</div></div>
+    <div class="gcard wide" data-g="expenses"><div class="dot">🧳</div><div class="gname">مصاريف</div><div class="gsub">إجمالي البيت + المسافرين بدون البنزين</div><div class="gval" id="gExpenses">0 ر.س</div><div class="gsplit"><div class="mini"><span class="k">البيت</span><span class="v" id="gHouse">0 ر.س</span></div><div class="mini"><span class="k">المسافرين</span><span class="v" id="gTravel">0 ر.س</span></div></div></div>
+    <div class="gcard" data-g="rent"><div class="dot">🏘️</div><div class="gname">الإيجار</div><div class="gsub">بند مستقل</div><div class="gval" id="gRent">0 ر.س</div></div>
+    <div class="gcard" data-g="fuel"><div class="dot">⛽</div><div class="gname">البنزين</div><div class="gsub">حساب مستقل للوقود</div><div class="gval" id="gFuel">0 ر.س</div></div>
+    <div class="gcard" data-g="delegations"><div class="dot">✈️</div><div class="gname">الانتدابات</div><div class="gsub">بند مستقل للانتدابات</div><div class="gval" id="gDelegations">0 ر.س</div></div>
+    <div class="gcard" data-g="other"><div class="dot">✨</div><div class="gname">أخرى / سلف</div><div class="gsub">متفرقات شهرية</div><div class="gval" id="gOther">0 ر.س</div></div>
+    <div class="gcard" data-g="debt-paid"><div class="dot">💳</div><div class="gname">الديون المدفوعة</div><div class="gsub">المسدّد هذا الشهر</div><div class="gval" id="gDebtPaid">0 ر.س</div></div>
+    <div class="gcard" data-g="debt-rem"><div class="dot">⏳</div><div class="gname">الديون المتبقية</div><div class="gsub">للشهور القادمة</div><div class="gval" id="gDebtRem">0 ر.س</div></div>
   </div>
 
   <div class="savings">
     <div class="pig"><span class="dollar">$</span></div>
     <div class="sinfo">
       <div class="stitle">مدخرات هذا الشهر</div>
-      <div class="smonth" id="savMonth">0 ⁦ر.س⁩</div>
-      <div class="stotal">المجموع المُدّخر خلال السنة: <b id="savTotal">0 ⁦ر.س⁩</b></div>
+      <div class="smonth" id="savMonth">0 ر.س</div>
+      <div class="stotal">المجموع المُدّخر خلال السنة: <b id="savTotal">0 ر.س</b></div>
     </div>
     <button class="sadd" id="savAdd" aria-label="إضافة مدخرات">＋</button>
   </div>
 
   <div class="actions">
-    <button class="btn btn-primary" id="addBtn">＋ إضافة بند</button>
+    <button class="btn btn-primary" id="addBtn"><span class="btn-label">إضافة منصرف جديد</span><span class="btn-plus">＋</span></button>
     <button class="btn btn-ghost" id="catBtn">⚙︎ الفئات</button>
     <button class="btn btn-ghost" id="repBtn">📄 التقارير</button>
   </div>
@@ -367,7 +388,7 @@
 <!-- مودال إضافة/تعديل مصروف -->
 <div class="overlay" id="itemModal">
   <div class="sheet">
-    <h3 id="itemTitle">إضافة بند</h3>
+    <h3 id="itemTitle">إضافة منصرف جديد</h3>
     <div class="field">
       <label>الفئة</label>
       <select id="f_cat"></select>
@@ -434,6 +455,7 @@
         <select id="c_group">
           <option value="expenses">مصاريف</option>
           <option value="rent">الإيجار</option>
+          <option value="delegations">الانتدابات</option>
           <option value="debts">الديون</option>
           <option value="other">أخرى / سلف</option>
         </select>
@@ -460,11 +482,12 @@
       <select id="weekSel"></select>
     </div>
     <div id="report-modal">
+      <p class="report-hint no-print">تظهر المعاينة أولاً داخل التطبيق، ثم تفتح نافذة الطباعة بعد تجهيز النسخة النهائية.</p>
       <div id="report-paper"></div>
     </div>
     <div class="sheet-actions no-print" style="margin-top:14px">
       <button class="btn btn-ghost" id="closeRep">إغلاق</button>
-      <button class="btn btn-primary" id="printRep" style="grid-column:auto">💾 حفظ / طباعة PDF</button>
+      <button class="btn btn-primary" id="printRep" style="grid-column:auto">🖨️ معاينة ثم طباعة PDF</button>
     </div>
   </div>
 </div>
@@ -472,16 +495,17 @@
 <script>
 "use strict";
 /* ============ التخزين ============ */
-const KEY = "suhayl_state_v2";
-const LEGACY_KEYS = ["suhayl_state_v1"];
+const KEY = "suhayl_state_v3";
+const LEGACY_KEYS = ["suhayl_state_v2","suhayl_state_v1"];
 const CUR = "ر.س";
-const GROUPS = {expenses:"مصاريف", rent:"الإيجار", other:"أخرى / سلف", debts:"الديون"};
+const GROUPS = {expenses:"مصاريف", rent:"الإيجار", delegations:"الانتدابات", other:"أخرى / سلف", debts:"الديون"};
 const EMOJIS = ["🛒","🏠","🧳","✈️","⛽","🏘️","💡","🌐","💳","🤝","🧾","🍔","🚗","💊","📱","👕","🎁","✨","☕","🏥","📚","🐾","💧","🔥","💵"];
 const REQUIRED_CATEGORIES = [
   {name:"غذائية", emoji:"🛒", group:"expenses"},
   {name:"منزلية", emoji:"🏠", group:"expenses"},
   {name:"بنزين", emoji:"⛽", group:"expenses"},
   {name:"إيجار", emoji:"🏘️", group:"rent"},
+  {name:"انتدابات", emoji:"✈️", group:"delegations"},
   {name:"كهرباء", emoji:"💡", group:"other"},
   {name:"نت", emoji:"🌐", group:"other"},
   {name:"سلفة", emoji:"🤝", group:"other"},
@@ -501,9 +525,10 @@ const defaultState = () => ({
 let state = load();
 function normalizeGroup(name, group){
   const label = String(name||"");
-  if(["expenses","rent","other","debts"].includes(group)) return group;
+  if(["expenses","rent","delegations","other","debts"].includes(group)) return group;
   if(/إيجار|ايجار/.test(label)) return "rent";
   if(/ديون|دين|تمارا|تابي/.test(label)) return "debts";
+  if(/انتداب|انتدابات/.test(label)) return "delegations";
   if(/سلفة/.test(label)) return "other";
   if(/غذائي|منزل|بنزين|قبرص|الصين|مسافر/.test(label)) return "expenses";
   if(group==="house") return "expenses";
@@ -553,7 +578,17 @@ const uid = () => Math.random().toString(36).slice(2,9);
 const num = v => { const n=parseFloat(v); return isNaN(n)?0:n; };
 function money(n, withCur=true){
   const f = new Intl.NumberFormat("en-US",{minimumFractionDigits:0, maximumFractionDigits:2}).format(Math.round((n+Number.EPSILON)*100)/100);
-  return withCur ? `⁦${f} ${CUR}⁩` : f;
+  return withCur ? `${f} ${CUR}` : f;
+}
+function isTravelCategory(cat){
+  const name = String(cat && cat.name || "");
+  const emoji = String(cat && cat.emoji || "");
+  return /قبرص|الصين|مسافر|مسافرين|سفر/i.test(name) || emoji === "🧳";
+}
+function isFuelCategory(cat){
+  const name = String(cat && cat.name || "");
+  const emoji = String(cat && cat.emoji || "");
+  return /بنزين|وقود|ديزل|fuel/i.test(name) || emoji === "⛽";
 }
 function pad(n){ return String(n).padStart(2,"0"); }
 const AR_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
@@ -638,7 +673,7 @@ function shiftMonth(d){
 function render(){
   seedMonth(selKey);
   const M=getMonth(selKey);
-  let paid=0,due=0,rem=0, g={expenses:0,rent:0,other:0,debtPaid:0,debtRem:0};
+  let paid=0,due=0,rem=0, g={expenses:0,house:0,travel:0,rent:0,fuel:0,delegations:0,other:0,debtPaid:0,debtRem:0};
   M.items.forEach(it=>{
     const p=num(it.paid), dd=num(it.due);
     const remaining = it.carry ? Math.max(dd-p,0) : 0;
@@ -648,6 +683,14 @@ function render(){
     if(group === "debts"){
       g.debtPaid += p;
       g.debtRem += remaining;
+    }else if(isFuelCategory(c)){
+      g.fuel += p;
+    }else if(group === "delegations"){
+      g.delegations += p;
+    }else if(group === "expenses"){
+      g.expenses += p;
+      if(isTravelCategory(c)) g.travel += p;
+      else g.house += p;
     }else{
       g[group] = (g[group]||0) + p;
     }
@@ -656,7 +699,11 @@ function render(){
   $("#totDue").textContent = money(due);
   $("#totRem").textContent = money(rem);
   $("#gExpenses").textContent = money(g.expenses);
+  $("#gHouse").textContent = money(g.house);
+  $("#gTravel").textContent = money(g.travel);
   $("#gRent").textContent = money(g.rent);
+  $("#gFuel").textContent = money(g.fuel);
+  $("#gDelegations").textContent = money(g.delegations);
   $("#gOther").textContent = money(g.other);
   $("#gDebtPaid").textContent = money(g.debtPaid);
   $("#gDebtRem").textContent = money(g.debtRem);
@@ -704,6 +751,7 @@ function itemKind(it,c){
   if(group==="debts") return "دين";
   if(c && /سلفة/.test(c.name||"")) return "سلفة";
   if(group==="rent") return "إيجار";
+  if(group==="delegations") return "انتداب";
   if(it.carry) return "بند مُرحّل";
   return "مصروف";
 }
@@ -739,7 +787,7 @@ function openItem(id){
     $("#f_inc").value=it.inc||""; $("#f_date").value=it.date||todayISO();
     $("#delItem").classList.remove("hide");
   }else{
-    $("#itemTitle").textContent="إضافة بند";
+    $("#itemTitle").textContent="إضافة منصرف جديد";
     $("#f_desc").value=""; setCarry(false);
     $("#f_due").value=""; $("#f_paid").value=""; $("#f_inc").value="";
     $("#f_date").value=todayISO();
@@ -898,21 +946,22 @@ function buildReport(){
     title="التقرير الشهري";
     periodLabel=mLabel(selKey);
   }
-  let paid=0,due=0,rem=0,debtPaid=0,debtRem=0;
-  const byGroup={expenses:[],rent:[],other:[],debts:[]};
+  let paid=0,due=0,rem=0,debtPaid=0,debtRem=0,fuelPaid=0;
+  const byGroup={expenses:[],rent:[],delegations:[],other:[],debts:[]};
   items.forEach(it=>{
     const p=num(it.paid), d=num(it.due), remaining=it.carry?Math.max(d-p,0):0;
     paid+=p; due+=d; rem+=remaining;
     const c=catById(it.catId);
     const group=(c&&c.group)||"other";
     if(group==="debts"){ debtPaid+=p; debtRem+=remaining; }
+    if(isFuelCategory(c)) fuelPaid+=p;
     (byGroup[group]||byGroup.other).push(it);
   });
   // مدخرات (الشهرية فقط — في التقرير الأسبوعي لا تظهر لأنها شهرية)
   const svObj = state.savings[selKey];
   const svAmt = (repType==="month" && svObj) ? num(svObj.amount) : 0;
   let rows="";
-  ["expenses","rent","other","debts"].forEach(gk=>{
+  ["expenses","rent","delegations","other","debts"].forEach(gk=>{
     const arr=byGroup[gk]; if(!arr.length) return;
     let gp=0; arr.forEach(it=>gp+=num(it.paid));
     rows+=`<tr class="grp"><td colspan="3">${GROUPS[gk]}</td><td>${money(gp)}</td></tr>`;
@@ -930,10 +979,16 @@ function buildReport(){
   const logo="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238b6cff'/%3E%3Cstop offset='1' stop-color='%233f7bff'/%3E%3C/linearGradient%3E%3ClinearGradient id='c' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe08a'/%3E%3Cstop offset='1' stop-color='%23ffb347'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='3' y='3' width='58' height='58' rx='16' fill='url(%23g)'/%3E%3Cpath d='M27 11 l3.2 9.8 9.8 3.2 -9.8 3.2 -3.2 9.8 -3.2 -9.8 -9.8 -3.2 9.8 -3.2 z' fill='white'/%3E%3Ccircle cx='45' cy='45' r='11.5' fill='url(%23c)' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E";
   const gen=new Date(); const genStr=`${gen.getFullYear()}-${pad(gen.getMonth()+1)}-${pad(gen.getDate())} ${pad(gen.getHours())}:${pad(gen.getMinutes())}`;
 
-  $("#report-paper").innerHTML=`
+  const paper=$("#report-paper");
+  paper.classList.toggle("month-mode", repType==="month");
+  paper.classList.toggle("week-mode", repType!=="month");
+  paper.innerHTML=`
     <div class="rp-head">
-      <img src="${logo}" alt="سهيل"/>
-      <div><div class="t">سُهيل</div><div class="s">تقرير المصاريف والديون</div></div>
+      <div class="rp-brand">
+        <img src="${logo}" alt="سهيل"/>
+        <div><div class="t">سُهيل</div><div class="s">تقرير المصاريف والديون</div></div>
+      </div>
+      <div class="rp-badge">${repType==="month" ? "نسخة شهرية جاهزة للطباعة" : "نسخة أسبوعية سريعة"}</div>
     </div>
     <div class="rp-title">${title}</div>
     <div class="rp-period">${periodLabel}</div>
@@ -943,10 +998,13 @@ function buildReport(){
       <div class="rc rem"><div class="l">المتبقي للأشهر القادمة</div><div class="v">${money(rem)}</div></div>
       <div class="rc"><div class="l">الديون المدفوعة</div><div class="v">${money(debtPaid)}</div></div>
       <div class="rc rem"><div class="l">الديون المتبقية</div><div class="v">${money(debtRem)}</div></div>
+      <div class="rc fuel"><div class="l">البنزين</div><div class="v">${money(fuelPaid)}</div></div>
+      <div class="rc"><div class="l">الانتدابات</div><div class="v">${money((byGroup.delegations||[]).reduce((s,it)=>s+num(it.paid),0))}</div></div>
     </div>
-    ${repType==="month" ? `<div class="rp-cards" style="grid-template-columns:1fr;margin-top:-8px">
-      <div class="rc" style="background:rgba(200,240,210,.55);border-color:rgba(80,170,110,.5)"><div class="l">💰 مدخرات هذا الشهر</div><div class="v" style="color:#2e8a52">${money(svAmt)}</div></div>
+    ${repType==="month" ? `<div class="rp-cards" style="grid-template-columns:1fr;margin-top:-6px">
+      <div class="rc" style="background:linear-gradient(180deg, rgba(210,244,220,.82), rgba(191,236,205,.62));border-color:rgba(80,170,110,.42)"><div class="l">💰 مدخرات هذا الشهر</div><div class="v" style="color:#2e8a52">${money(svAmt)}</div></div>
     </div>` : ""}
+    <div class="rp-divider"></div>
     <table class="rp">
       <thead><tr><th>البند</th><th>التاريخ</th><th>المتبقي</th><th>المدفوع</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -976,12 +1034,13 @@ function printReport(){
   const prevOverflow=document.body.style.overflow;
   modal.classList.add("show");
   document.body.style.overflow="";
+  $("#report-modal").scrollIntoView({behavior:"smooth", block:"start"});
   const cleanup=()=>{
     document.body.style.overflow=prevOverflow;
     window.removeEventListener("afterprint", cleanup);
   };
   window.addEventListener("afterprint", cleanup);
-  setTimeout(()=>window.print(), 80);
+  setTimeout(()=>window.print(), 320);
 }
 $("#printRep").addEventListener("click", printReport);
 
