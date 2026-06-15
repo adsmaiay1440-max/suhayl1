@@ -315,6 +315,36 @@
   }
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   @media (max-width:360px){.groups{gap:7px}.gcard{padding:11px 7px}.total .big{font-size:36px}}
+
+
+  /* ===== تحسين اتجاه العملة والتبويبات الجديدة للتقارير ===== */
+  .money-dir{direction:rtl!important;unicode-bidi:isolate!important;white-space:nowrap;}
+  .total .big{direction:rtl!important;}
+  .total .sub b,.gcard .gval,.gcard .mini .v,.savings .smonth,.savings .stotal b,.item .amt,
+  .rp-cards .rc .v,table.rp th:last-child,table.rp td:last-child{direction:rtl!important;unicode-bidi:isolate!important;}
+  .report-main-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .report-main-tabs button{border:1px solid var(--border);background:var(--card2);color:var(--muted);border-radius:14px;
+    padding:12px 10px;font-family:var(--font-b);font-weight:800;font-size:14px;cursor:pointer;}
+  .report-main-tabs button.on{background:linear-gradient(100deg,var(--violet),#a94cff);color:#fff;box-shadow:0 10px 24px -14px rgba(139,108,255,.9);}
+  .report-filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .report-filters .field{margin-bottom:0;}
+  .report-details{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+  .report-details-title{font-family:var(--font-d);font-size:16px;color:#e8e9ff;margin:2px 4px 0;font-weight:700;}
+  .report-entry{position:relative;background:linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.032));border:1px solid var(--border);
+    border-radius:18px;padding:13px 13px 13px 12px;overflow:hidden;box-shadow:0 12px 30px -20px rgba(0,0,0,.75);}
+  .report-entry::after{content:"";position:absolute;top:0;bottom:0;right:0;width:4px;background:var(--teal);border-radius:0 18px 18px 0;opacity:.9;}
+  .report-entry.out::after{background:var(--danger);}
+  .report-entry .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .report-entry .amount{font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--teal);direction:rtl;unicode-bidi:isolate;white-space:nowrap;}
+  .report-entry.out .amount{color:#ff8d8d;}
+  .report-entry .date{font-size:12px;color:var(--muted);white-space:nowrap;}
+  .report-entry .name{font-family:var(--font-d);font-weight:700;font-size:16px;color:#75ffc5;margin-top:5px;}
+  .report-entry.out .name{color:#ffb0a0;}
+  .report-entry .pill2{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:999px;font-size:11px;border:1px solid rgba(94,224,216,.34);color:var(--teal);background:rgba(94,224,216,.13);}
+  .report-entry.out .pill2{border-color:rgba(255,107,138,.36);color:#ff8ea2;background:rgba(255,107,138,.13);}
+  .report-entry .pdf-mini{margin-top:12px;border:1px solid rgba(255,107,138,.26);background:rgba(255,107,138,.08);color:#ff9aa9;border-radius:12px;padding:9px;text-align:center;font-weight:800;font-size:13px;}
+  @media (max-width:420px){.report-filters{grid-template-columns:1fr}.report-main-tabs{gap:8px}.report-main-tabs button{font-size:13px;padding:10px 8px}}
+
 </style>
 </head>
 <body>
@@ -473,6 +503,10 @@
 <div class="overlay" id="repModal" style="align-items:center;padding:14px;">
   <div class="sheet" style="border-radius:24px;max-height:92vh;">
     <h3 class="no-print">📄 التقارير</h3>
+    <div class="report-main-tabs no-print" id="reportModeTabs">
+      <button data-mode="general" class="on">السجلات 📋</button>
+      <button data-mode="custom">تقارير مخصصة 🧮</button>
+    </div>
     <div class="seg no-print" id="repSeg">
       <button data-t="week" class="on">تقرير أسبوعي</button>
       <button data-t="month">تقرير شهري</button>
@@ -481,9 +515,29 @@
       <label>اختر الأسبوع</label>
       <select id="weekSel"></select>
     </div>
+    <div class="report-filters no-print hide" id="customWrap">
+      <div class="field">
+        <label>نوع التقرير</label>
+        <select id="repFilter">
+          <option value="general">عام</option>
+          <option value="house">مصاريف البيت: غذائية ومنزلية</option>
+          <option value="travel">مصاريف المسافرين: قبرص والصين</option>
+          <option value="delegations">الانتدابات</option>
+          <option value="other">أخرى / سلف</option>
+          <option value="debts">الديون</option>
+          <option value="rent">الإيجار</option>
+          <option value="fuel">البنزين</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>بحث داخل التفاصيل</label>
+        <input type="text" id="repSearch" placeholder="ابحث باسم البند أو الملاحظة" />
+      </div>
+    </div>
     <div id="report-modal">
       <p class="report-hint no-print">تظهر المعاينة أولاً داخل التطبيق، ثم تفتح نافذة الطباعة بعد تجهيز النسخة النهائية.</p>
       <div id="report-paper"></div>
+      <div id="reportDetails" class="report-details no-print"></div>
     </div>
     <div class="sheet-actions no-print" style="margin-top:14px">
       <button class="btn btn-ghost" id="closeRep">إغلاق</button>
@@ -584,6 +638,11 @@ function isTravelCategory(cat){
   const name = String(cat && cat.name || "");
   const emoji = String(cat && cat.emoji || "");
   return /قبرص|الصين|مسافر|مسافرين|سفر/i.test(name) || emoji === "🧳";
+}
+function isHouseCategory(cat){
+  const name = String(cat && cat.name || "");
+  const emoji = String(cat && cat.emoji || "");
+  return /غذائي|غذائية|تموين|منزل|منزلية|بيت/i.test(name) || emoji === "🛒" || emoji === "🏠";
 }
 function isFuelCategory(cat){
   const name = String(cat && cat.name || "");
@@ -688,9 +747,15 @@ function render(){
     }else if(group === "delegations"){
       g.delegations += p;
     }else if(group === "expenses"){
-      g.expenses += p;
-      if(isTravelCategory(c)) g.travel += p;
-      else g.house += p;
+      if(isTravelCategory(c)){
+        g.travel += p;
+        g.expenses += p;
+      }else if(isHouseCategory(c)){
+        g.house += p;
+        g.expenses += p;
+      }else{
+        g.other += p;
+      }
     }else{
       g[group] = (g[group]||0) + p;
     }
@@ -910,6 +975,17 @@ $("#closeCat").addEventListener("click", ()=>{ hide("#catModal"); render(); });
 
 /* ============ التقارير ============ */
 let repType="week";
+let reportMode="general";
+const REPORT_FILTERS = {
+  general:"عام",
+  house:"مصاريف البيت",
+  travel:"مصاريف المسافرين",
+  delegations:"الانتدابات",
+  other:"أخرى / سلف",
+  debts:"الديون",
+  rent:"الإيجار",
+  fuel:"البنزين"
+};
 function weeksOf(key){
   const [y,m]=key.split("-").map(Number);
   const days=new Date(y,m,0).getDate();
@@ -925,41 +1001,91 @@ function buildWeekSel(){
     o.textContent=`الأسبوع ${i+1} (${w[0]} – ${w[1]} ${AR_MONTHS[+selKey.split("-")[1]-1]})`;
     sel.appendChild(o);
   });
-  // افتراضياً الأسبوع الحالي إن كان الشهر هو الحالي
   const t=new Date();
   if(YEAR+"-"+pad(t.getMonth()+1)===selKey){
     const wi=wks.findIndex(w=> t.getDate()>=w[0] && t.getDate()<=w[1]);
     if(wi>=0) sel.value=wi;
   }
 }
+function matchesReportFilter(it, filter){
+  if(!filter || filter==="general") return true;
+  const c=catById(it.catId)||{};
+  const group=c.group||"other";
+  if(filter==="house") return group==="expenses" && isHouseCategory(c) && !isFuelCategory(c);
+  if(filter==="travel") return group==="expenses" && isTravelCategory(c) && !isFuelCategory(c);
+  if(filter==="fuel") return isFuelCategory(c);
+  if(filter==="delegations") return group==="delegations";
+  if(filter==="other") return group==="other" || /سلفة/.test(c.name||"");
+  if(filter==="debts") return group==="debts";
+  if(filter==="rent") return group==="rent";
+  return true;
+}
+function matchesReportSearch(it, term){
+  if(!term) return true;
+  const c=catById(it.catId)||{};
+  const hay=[c.name,c.emoji,it.desc,it.date,itemKind(it,c)].join(" ").toLowerCase();
+  return hay.includes(term.toLowerCase());
+}
+function currentReportFilter(){
+  return reportMode==="custom" ? ($("#repFilter").value || "general") : "general";
+}
+function renderReportDetails(items, filter, title){
+  const box=$("#reportDetails");
+  if(!box) return;
+  const sorted=[...items].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  if(!sorted.length){
+    box.innerHTML=`<div class="report-details-title">تفاصيل ${title}</div><div class="empty" style="padding:18px 10px">لا توجد عمليات مطابقة لهذا التقرير</div>`;
+    return;
+  }
+  box.innerHTML=`<div class="report-details-title">تفاصيل ${title}</div>` + sorted.map(it=>{
+    const c=catById(it.catId)||{name:"غير مصنّف",emoji:"✨",group:"other"};
+    const isOut = c.group!=="delegations";
+    const remaining=it.carry?Math.max(num(it.due)-num(it.paid),0):0;
+    const desc=it.desc ? ` / ${escapeHtml(it.desc)}` : "";
+    return `<div class="report-entry ${isOut?"out":""}">
+      <div class="top"><div class="amount">${money(num(it.paid))}</div><div class="date">◷ ${it.date||""}</div></div>
+      <div class="name">${c.emoji} ${escapeHtml(c.name)}${desc}</div>
+      <span class="pill2">${itemKind(it,c)}</span>
+      ${remaining>0?`<span class="pill2">متبقي ${money(remaining)}</span>`:""}
+      <div class="pdf-mini">📄 تصدير PDF لهذه العملية</div>
+    </div>`;
+  }).join("");
+}
 function buildReport(){
   const M=getMonth(selKey);
   let items=[...M.items];
-  let periodLabel="", title="";
+  let periodLabel="", baseTitle="";
   if(repType==="week"){
     const wi=+$("#weekSel").value||0;
-    const w=weeksOf(selKey)[wi];
+    const w=weeksOf(selKey)[wi] || [1,7];
     items=items.filter(it=>{ const d=+(it.date||"").split("-")[2]; return d>=w[0] && d<=w[1]; });
-    title="التقرير الأسبوعي";
+    baseTitle="التقرير الأسبوعي";
     periodLabel=`الأسبوع ${wi+1} · ${w[0]}–${w[1]} ${mLabel(selKey)}`;
   }else{
-    title="التقرير الشهري";
+    baseTitle="التقرير الشهري";
     periodLabel=mLabel(selKey);
   }
-  let paid=0,due=0,rem=0,debtPaid=0,debtRem=0,fuelPaid=0;
+  const filter=currentReportFilter();
+  const term=reportMode==="custom" ? ($("#repSearch").value||"").trim() : "";
+  items=items.filter(it=>matchesReportFilter(it, filter)).filter(it=>matchesReportSearch(it, term));
+  const filterTitle = REPORT_FILTERS[filter] || "عام";
+  const title = reportMode==="custom" && filter!=="general" ? `${baseTitle} — ${filterTitle}` : baseTitle;
+
+  let paid=0,due=0,rem=0,debtPaid=0,debtRem=0,fuelPaid=0,housePaid=0,travelPaid=0;
   const byGroup={expenses:[],rent:[],delegations:[],other:[],debts:[]};
   items.forEach(it=>{
     const p=num(it.paid), d=num(it.due), remaining=it.carry?Math.max(d-p,0):0;
     paid+=p; due+=d; rem+=remaining;
-    const c=catById(it.catId);
-    const group=(c&&c.group)||"other";
+    const c=catById(it.catId)||{};
+    const group=c.group||"other";
     if(group==="debts"){ debtPaid+=p; debtRem+=remaining; }
     if(isFuelCategory(c)) fuelPaid+=p;
+    if(group==="expenses" && isHouseCategory(c) && !isFuelCategory(c)) housePaid+=p;
+    if(group==="expenses" && isTravelCategory(c) && !isFuelCategory(c)) travelPaid+=p;
     (byGroup[group]||byGroup.other).push(it);
   });
-  // مدخرات (الشهرية فقط — في التقرير الأسبوعي لا تظهر لأنها شهرية)
   const svObj = state.savings[selKey];
-  const svAmt = (repType==="month" && svObj) ? num(svObj.amount) : 0;
+  const svAmt = (repType==="month" && svObj && filter==="general") ? num(svObj.amount) : 0;
   let rows="";
   ["expenses","rent","delegations","other","debts"].forEach(gk=>{
     const arr=byGroup[gk]; if(!arr.length) return;
@@ -991,17 +1117,19 @@ function buildReport(){
       <div class="rp-badge">${repType==="month" ? "نسخة شهرية جاهزة للطباعة" : "نسخة أسبوعية سريعة"}</div>
     </div>
     <div class="rp-title">${title}</div>
-    <div class="rp-period">${periodLabel}</div>
+    <div class="rp-period">${periodLabel}${reportMode==="custom" ? ` · ${filterTitle}` : ""}</div>
     <div class="rp-cards">
       <div class="rc tot"><div class="l">إجمالي المدفوع</div><div class="v">${money(paid)}</div></div>
       <div class="rc"><div class="l">إجمالي المطلوب</div><div class="v">${money(due)}</div></div>
       <div class="rc rem"><div class="l">المتبقي للأشهر القادمة</div><div class="v">${money(rem)}</div></div>
-      <div class="rc"><div class="l">الديون المدفوعة</div><div class="v">${money(debtPaid)}</div></div>
-      <div class="rc rem"><div class="l">الديون المتبقية</div><div class="v">${money(debtRem)}</div></div>
+      <div class="rc"><div class="l">مصاريف البيت</div><div class="v">${money(housePaid)}</div></div>
+      <div class="rc"><div class="l">مصاريف المسافرين</div><div class="v">${money(travelPaid)}</div></div>
       <div class="rc fuel"><div class="l">البنزين</div><div class="v">${money(fuelPaid)}</div></div>
       <div class="rc"><div class="l">الانتدابات</div><div class="v">${money((byGroup.delegations||[]).reduce((s,it)=>s+num(it.paid),0))}</div></div>
+      <div class="rc"><div class="l">الديون المدفوعة</div><div class="v">${money(debtPaid)}</div></div>
+      <div class="rc rem"><div class="l">الديون المتبقية</div><div class="v">${money(debtRem)}</div></div>
     </div>
-    ${repType==="month" ? `<div class="rp-cards" style="grid-template-columns:1fr;margin-top:-6px">
+    ${repType==="month" && filter==="general" ? `<div class="rp-cards" style="grid-template-columns:1fr;margin-top:-6px">
       <div class="rc" style="background:linear-gradient(180deg, rgba(210,244,220,.82), rgba(191,236,205,.62));border-color:rgba(80,170,110,.42)"><div class="l">💰 مدخرات هذا الشهر</div><div class="v" style="color:#2e8a52">${money(svAmt)}</div></div>
     </div>` : ""}
     <div class="rp-divider"></div>
@@ -1011,12 +1139,28 @@ function buildReport(){
       <tfoot><tr><td colspan="3">الإجمالي المدفوع</td><td>${money(paid)}</td></tr></tfoot>
     </table>
     <div class="rp-foot">صُدر بواسطة تطبيق سُهيل · ${genStr}</div>`;
+  renderReportDetails(items, filter, title);
+}
+function setReportMode(mode){
+  reportMode=mode;
+  $("#reportModeTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.mode===mode));
+  $("#customWrap").classList.toggle("hide", mode!=="custom");
+  buildReport();
 }
 $("#repBtn").addEventListener("click", ()=>{
   repType="week";
+  reportMode="general";
+  $("#reportModeTabs").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.mode==="general"));
   $("#repSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.t==="week"));
   $("#weekWrap").classList.remove("hide");
+  $("#customWrap").classList.add("hide");
+  $("#repFilter").value="general";
+  $("#repSearch").value="";
   buildWeekSel(); buildReport(); show("#repModal");
+});
+$("#reportModeTabs").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  setReportMode(b.dataset.mode);
 });
 $("#repSeg").addEventListener("click", e=>{
   const b=e.target.closest("button"); if(!b) return;
@@ -1027,6 +1171,8 @@ $("#repSeg").addEventListener("click", e=>{
   buildReport();
 });
 $("#weekSel").addEventListener("change", buildReport);
+$("#repFilter").addEventListener("change", buildReport);
+$("#repSearch").addEventListener("input", buildReport);
 $("#closeRep").addEventListener("click", ()=>hide("#repModal"));
 function printReport(){
   buildReport();
