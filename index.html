@@ -864,9 +864,11 @@ $("#addBtn").addEventListener("click", ()=>openItem(null));
 $("#cancelItem").addEventListener("click", ()=>hide("#itemModal"));
 $("#saveItem").addEventListener("click", ()=>{
   const carry=$("#f_carry_sw").classList.contains("on");
+  const selectedCat = catById($("#f_cat").value) || {};
+  const isDelegation = selectedCat.group === "delegations";
   const paid=num($("#f_paid").value);
   const due = carry ? num($("#f_due").value) : paid;
-  if(due<=0 && paid<=0){ alert("الرجاء إدخال مبلغ"); return; }
+  if(!isDelegation && due<=0 && paid<=0){ alert("الرجاء إدخال مبلغ لهذا البند"); return; }
   const data={
     catId:$("#f_cat").value, desc:$("#f_desc").value.trim(),
     due:due, paid:paid, carry:carry, inc: carry?num($("#f_inc").value):0,
